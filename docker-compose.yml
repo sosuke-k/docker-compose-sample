@@ -1,0 +1,42 @@
+version: '2'
+
+services:
+
+  datastore:
+    build: datastore/
+    volumes:
+      - /usr/share/elasticsearch/data:/usr/share/elasticsearch/data
+      - /var/log/fluentd:/var/log/fluentd
+      - /var/log/nginx:/var/log/nginx
+
+  elasticsearch:
+    build: ./elasticsearch
+    expose:
+      - "9200"
+      - "9300"
+    volumes_from:
+      - datastore
+
+  fluentd:
+    build: fluentd/
+    links:
+      - "elasticsearch"
+    volumes_from:
+      - datastore
+
+  nginx:
+    build: web/
+    ports:
+      - '80:80'
+      - '8080:8080'
+    links:
+      - "kibana"
+    volumes_from:
+      - datastore
+
+  kibana:
+    build: kibana/
+    links:
+     - "elasticsearch"
+    expose:
+      - "5601"

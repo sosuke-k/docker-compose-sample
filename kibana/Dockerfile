@@ -1,0 +1,3 @@
+FROM kibana:4.5.4
+
+EXPOSE 5601
